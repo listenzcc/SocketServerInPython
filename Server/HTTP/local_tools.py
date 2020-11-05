@@ -20,3 +20,14 @@ class Tools(object):
             return content.encode(self.coding)
         else:
             return content
+
+    def short(self, content, nums=(30, 30), keep_raw=False):
+        # Short the content
+        # nums: The numbers of characters of leading and tailing
+        content = self.decode(content)
+        content = ' '.join([e.strip() for e in content.split()])
+        content.replace('\r\n', ' ')
+        if keep_raw or len(content) < nums[0] + nums[1]:
+            return content
+        else:
+            return '"{} ... {}"'.format(content[:nums[0]], content[-nums[1]:])
