@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Colors Demo</title>
+    <script src="../d3.min.js"></script>
+    <style type="text/css">
+      div {
+        border: 1px solid #cbcbcb;
+        padding: 3px;
+      }
+
+      div.Segment {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+      }
+
+      div.ColoredBlock {
+        width: 30px;
+        height: 30px;
+        border: 0px;
+        background-color: rosybrown;
+        margin: 5px;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div>
+      <h1>Colors Demo</h1>
+      <p>Useful and interactive colors web app</p>
+      <div>
+        <h2>Colors generator in HSV space</h2>
+        <div>
+          <h2>RGB controller</h2>
+          <input
+            id="scale_r0"
+            type="range"
+            min="0"
+            max="255"
+            value="120"
+            step="1"
+            onchange="recolor()"
+          />
+          <input
+            id="scale_g0"
+            type="range"
+            min="0"
+            max="255"
+            value="120"
+            step="1"
+            onchange="recolor()"
+          />
+          <input
+            id="scale_b0"
+            type="range"
+            min="0"
+            max="255"
+            value="120"
+            step="1"
+            onchange="recolor()"
+          />
+        </div>
+
+        <div>
+          <h2>Color blocks</h2>
+          <div class="Segment" id="divColorList"></div>
+          <div>
+            <h2>Block controller</h2>
+            <input
+              id="scale_1"
+              type="range"
+              min="5"
+              max="15"
+              value="10"
+              step="1"
+              onchange="relist(this.value)"
+            />
+            <script>
+              function format_rgb(rgb) {
+                // Format rgb into hex string,
+                // the rgb value is [r, g, b] array
+                function int2hex(x) {
+                  // Convert int into hex string,
+                  // the hex string will be of 2-char length
+                  var hex = parseInt(x).toString(16);
+                  if (hex.length == 1) {
+                    hex = "0" + hex;
+                  }
+                  return hex;
+                }
+                var r = rgb[0];
+                var g = rgb[1];
+                var b = rgb[2];
+                return "#" + int2hex(r) + int2hex(g) + int2hex(b);
+              }
+
+              function get_rgb() {
+                // Get rgb value from elements
+                return [
+                  document.getElementById("scale_r0").value,
+                  document.getElementById("scale_g0").value,
+                  document.getElementById("scale_b0").value,
+                ];
+              }
+
+              function recolor() {
+                // Re-color the first color block
+                var rgb0 = format_rgb(get_rgb());
+                console.log("RGB of color block 0 is ", rgb0);
+                let blocks = document.getElementsByClassName("ColoredBlock");
+                blocks[0].style.backgroundColor = rgb0;
+              }
+              function relist(num) {
+                // Re-list the color blocks
+                console.log(num);
+                var rgb0 = get_rgb();
+                var colors = [];
+                for (var i = 0; i < num; i++) {
+                  colors[i] = [i];
+                  r = (1 - i / num) * rgb0[0];
+                  g = (1 - i / num) * rgb0[1];
+                  b = (1 - i / num) * rgb0[2];
+                  colors[i][1] = format_rgb([r, g, b]);
+                }
+                let div = d3.select("#divColorList");
+                div.selectAll("div.ColoredBlock").remove();
+
+                div
+                  .selectAll("div.ColoredBlock")
+                  .data(colors)
+                  .enter()
+                  .append("div")
+                  .attr("class", "ColoredBlock")
+                  .attr("style", (d) => {
+                    return "background-color: " + d[1];
+                  })
+                  .text((d) => {
+                    return d[0];
+                  });
+
+                recolor();
+              }
+              relist(10);
+            </script>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
