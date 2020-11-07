@@ -95,8 +95,8 @@ class Request(object):
 
 
 class ClientConnection(object):
-    # Object of serving cliend connection,
-    # used when client connectiono incomes
+    # Object of serving client connection,
+    # used when client connection incomes
     def __init__(self, client, address):
         # Initialize
         # Setup connection values
@@ -127,7 +127,7 @@ class ClientConnection(object):
         # Listen and handle incoming messages
         try:
             # Wait until receive new incoming message
-            # !!! It may block the client listner if the connection is broken.
+            # !!! It may block the client listener if the connection is broken.
             income = self.client.recv(tools.buffer_size)
             CONFIG.logger.info(
                 f'Received {tools.short(income)} from {self.address}')
@@ -167,31 +167,3 @@ class ClientConnection(object):
         message = tools.encode(message)
         self.client.sendall(message)
         CONFIG.logger.debug(f'Send {tools.short(message)} to {self.address}')
-
-
-# Init values
-host = CONFIG.get('Server', 'IP')
-port = int(CONFIG.get('Server', 'port'))
-coding = CONFIG.get('Server', 'coding')
-
-
-def main(host=host, port=port, coding=coding):
-    # Echo server program
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((host, port))
-        s.listen(1)
-        while True:
-            conn, addr = s.accept()
-            with conn:
-                print('Connected by', addr)
-                data = conn.recv(1024)
-                print(data)
-                # conn.sendall(data)
-                conn.send('\n'.join([
-                    'HTTP/1.1 200 OK', 'Content-Type: text/html', '\n',
-                    data.decode(coding)
-                ]).encode(coding))
-
-
-if __name__ == '__main__':
-    main()
