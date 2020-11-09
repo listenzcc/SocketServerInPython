@@ -5,7 +5,9 @@ import json
 import socket
 import threading
 import traceback
-from . import CONFIG, tools
+from . import CONFIG
+from .local_tools import Tools
+tools = Tools()
 CONFIG.logger.debug('Define components in HTTP package')
 
 
@@ -66,34 +68,6 @@ class HTTPServer(object):
             self.connection_pool.append(connection)
 
 
-class Request(object):
-    # Easy-to-use request object,
-    # used to manage the request.
-    def __init__(self, request):
-        # Init with the [request]
-        # Regularize the request
-        self.request = tools.decode(request)
-        self.parsed = self.parse(self.request)
-
-    def parse(self, request):
-        # Parse the request
-        CONFIG.logger.debug(f'Parsing {tools.short(request)}')
-        # Split and clean the raw input
-        split = [e.strip() for e in request.split('\r\n')]
-        split = [e for e in split if len(e) > 0]
-        # print('-' * 80)
-        # print(split)
-        # Parse the header
-        header = split[0].split()
-        parsed = dict(type=header[0], query=header[1], version=header[2])
-        # Parser others
-        for other in split[1:]:
-            values = other.split(' ', 2)
-            parsed[values[0]] = values[1]
-        CONFIG.logger.debug(f'Parsed: {parsed}')
-        return parsed
-
-
 class ClientConnection(object):
     # Object of serving client connection,
     # used when client connection incomes
@@ -138,20 +112,15 @@ class ClientConnection(object):
                 self.close()
 
             # Make response content
-            content_code = b'HTTP/1.1 200 OK'
+            parsed_request = tools.parse_request(income)
 
-            content = income
-            content_type = b'Content-Type: text/html'
+            if parsed_request['method'] == 'GET' and parsed_request['path'] == '/favicon.ico':
+                self.send(tools.default_icon())
+                return
 
-            request = Request(income)
-            content = json.dumps(request.parsed)
-            content_type = b'Content-Type: application/json'
-
-            # Sendback response
-            # self.send(f'Message is received: {income}')
-            content = tools.encode(content)
-            self.send(b'\r\n'.join(
-                [content_code, content_type, b'\r\n', content]))
+            res_params = dict(resType='Content-Type: application/json',
+                              resContent=json.dumps(parsed_request))
+            self.send(tools.make_response(**res_params))
 
         except Exception as err:
             # Catch unexpected exception

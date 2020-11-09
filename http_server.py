@@ -1,4 +1,4 @@
-from Server.HTTP.defines import HTTPServer
+from Server.HTTP.server import HTTPServer
 
 server = HTTPServer()
 
