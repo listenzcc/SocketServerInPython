@@ -16,6 +16,7 @@ class HTTPServer(object):
     # HTTPServer object
     def __init__(self):
         # Initialize
+        self.buffer_size = int(CONFIG.get('Server', 'bufferSize'))
         self.connection_pool = []
 
     def get_connections(self):
@@ -63,7 +64,8 @@ class HTTPServer(object):
             # Wait until new client connection is established
             client, address = self.server.accept()
             # Generate new connection object
-            connection = ClientConnection(client=client, address=address)
+            connection = ClientConnection(
+                client=client, address=address, buffer_size=self.buffer_size)
             # connection.send('Hello from server')
             CONFIG.logger.info(f'New connection established at {address}')
             self.connection_pool.append(connection)
@@ -72,11 +74,12 @@ class HTTPServer(object):
 class ClientConnection(object):
     # Object of serving client connection,
     # used when client connection incomes
-    def __init__(self, client, address):
+    def __init__(self, client, address, buffer_size):
         # Initialize
         # Setup connection values
         self.client = client
         self.address = address
+        self.buffer_size = buffer_size
         # Start serving
         self.start()
         self.is_connected = True
@@ -103,7 +106,7 @@ class ClientConnection(object):
         try:
             # Wait until receive new incoming message
             # !!! It may block the client listener if the connection is broken.
-            income = self.client.recv(tools.buffer_size)
+            income = self.client.recv(self.buffer_size)
             CONFIG.logger.info(
                 f'Received {tools.short(income)} from {self.address}')
 
