@@ -12,8 +12,6 @@ src_dir = CONFIG.get('Runtime', 'srcDir')
 default_src_dir = CONFIG.get('Default', 'srcDir')
 known_types = CONFIG.get_section('KnownTypes')
 
-print(src_dir, default_src_dir, known_types)
-
 
 class Worker(object):
     # Backend worker object

@@ -15,7 +15,7 @@ parser = configparser.ConfigParser()
 parser.read(setting_path)
 
 # Init Config
-CONFIG = Config()
+CONFIG = Config(use_default=False)
 CONFIG.reload_logger(log_filepath=parser.get('Runtime', 'logPath'),
                      name=parser.get('Runtime', 'mode'))
 CONFIG.reload_cfg(setting_path)

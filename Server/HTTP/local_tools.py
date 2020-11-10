@@ -5,8 +5,7 @@ import os
 import threading
 from . import CONFIG
 
-coding = CONFIG.get('Server', 'coding')
-buffer_size = CONFIG.get('Server', 'bufferSize')
+coding = CONFIG.get('Server', 'coding', default_value='utf-8')
 default_src_dir = CONFIG.get('Default', 'srcDir')
 
 CONFIG.logger.debug('Local tools imported in HTTP package')
@@ -15,15 +14,12 @@ CONFIG.logger.debug('Local tools imported in HTTP package')
 class Tools(object):
     _instance_lock = threading.Lock()
 
-    def __init__(self, coding=coding, buffer_size=buffer_size):
+    def __init__(self, coding=coding):
         self.called_counting = 0
         if self.called_counting == 0:
             self.coding = coding
-            self.buffer_size = buffer_size
-            CONFIG.logger.debug(f'Tools setup as coding: {coding}')
-            self.called_counting += 1
-        else:
-            pass
+            CONFIG.logger.debug(f'Tools initialized as coding: {coding}')
+        self.called_counting += 1
 
     def __new__(cls, *args, **kwargs):
         # Threading-safe Singleton mode
@@ -74,6 +70,8 @@ class Tools(object):
         for other in split[1:]:
             values = other.split(' ', 2)
             parsed[values[0]] = values[1]
+        CONFIG.logger.info('Parsed: {} - {}'.format(parsed['method'],
+                                                    parsed['path']))
         CONFIG.logger.debug(f'Parsed: {parsed}')
         return parsed
 

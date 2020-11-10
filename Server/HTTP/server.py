@@ -16,7 +16,6 @@ class HTTPServer(object):
     # HTTPServer object
     def __init__(self):
         # Initialize
-        self.buffer_size = int(CONFIG.get('Server', 'bufferSize'))
         self.connection_pool = []
 
     def get_connections(self):
@@ -63,9 +62,10 @@ class HTTPServer(object):
         while True:
             # Wait until new client connection is established
             client, address = self.server.accept()
+            buffer_size = int(CONFIG.get('Server', 'bufferSize'))
             # Generate new connection object
             connection = ClientConnection(
-                client=client, address=address, buffer_size=self.buffer_size)
+                client=client, address=address, buffer_size=buffer_size)
             # connection.send('Hello from server')
             CONFIG.logger.info(f'New connection established at {address}')
             self.connection_pool.append(connection)
