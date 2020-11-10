@@ -2,19 +2,44 @@
 # Aim: Provide reuseable tools for the package
 
 import os
+import threading
 from . import CONFIG
 
 coding = CONFIG.get('Server', 'coding')
-buffer_size = int(CONFIG.get('Server', 'bufferSize'))
 default_src_dir = CONFIG.get('Default', 'srcDir')
+
+CONFIG.logger.debug('Local tools imported in HTTP package')
 
 
 class Tools(object):
-    def __init__(self, coding=coding, buffer_size=buffer_size):
-        self.coding = coding
-        self.buffer_size = buffer_size
-        CONFIG.logger.debug(
-            f'Tools initialized as coding: {coding}, buffer_size: {buffer_size}')
+    _instance_lock = threading.Lock()
+
+    def __init__(self, coding=coding):
+        self.called_counting = 0
+        if self.called_counting == 0:
+            self.coding = coding
+            CONFIG.logger.debug(f'Tools setup as coding: {coding}')
+            self.called_counting += 1
+        else:
+            pass
+
+    def __new__(cls, *args, **kwargs):
+        # Threading-safe Singleton mode
+        if hasattr(Tools, '_instance'):
+            CONFIG.logger.debug(
+                f'Tools instance exists, using it in Singleton mode')
+        else:
+            with Tools._instance_lock:
+                if not hasattr(Tools, '_instance'):
+                    Tools._instance = object.__new__(cls, *args, **kwargs)
+            CONFIG.logger.debug(f'Tools initialized new instance')
+        return Tools._instance
+
+    def _synchronize_settings(self):
+        # Synchronize settings,
+        # in case the settings change on running
+        self.coding = CONFIG.get('Server', 'coding')
+        CONFIG.logger.debug(f'Tools synchronized as coding: {coding}')
 
     def decode(self, content):
         # Decode [content] if necessary

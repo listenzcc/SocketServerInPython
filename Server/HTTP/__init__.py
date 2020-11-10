@@ -1,8 +1,8 @@
 # File: __init__.py
 # Aim: HTTP package initialization
 
-import os
 import configparser
+import os
 from ..QuickPythonConfig.Package import Config
 
 dirname = os.path.dirname(__file__)
@@ -21,7 +21,7 @@ CONFIG.reload_logger(log_filepath=parser.get('Runtime', 'logPath'),
 CONFIG.reload_cfg(setting_path)
 
 # Set necessary Config values
-CONFIG.set('Default', 'srcDir', os.path.join(dirname, '..', 'DefaultSrc'))
+CONFIG.set('Default', 'packageDir', dirname)
 
 # Show what we got
 CONFIG.logger.debug(f'Current configure:\n{CONFIG.peek()}')

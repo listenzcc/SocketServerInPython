@@ -7,8 +7,9 @@ import threading
 import traceback
 from . import CONFIG
 from .local_tools import Tools
+from .worker import Worker
 tools = Tools()
-CONFIG.logger.debug('Define components in HTTP package')
+CONFIG.logger.debug('HTTP server imported in HTTP package')
 
 
 class HTTPServer(object):
