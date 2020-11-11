@@ -1,4 +1,8 @@
 from Server.HTTP.server import HTTPServer
+from Server.HTTP import CONFIG
+
+src_dir = './Demos/X11_color_set'
+CONFIG.set('Runtime', 'srcDir', src_dir)
 
 server = HTTPServer()
 
@@ -6,7 +10,7 @@ if __name__ == '__main__':
     server.start_pipeline()
     while True:
         num = len(server.get_connections())
-        prompt = f'Server ({num}) >> '
+        prompt = f'Server ({src_dir}) >> '
         msg = input(prompt)
 
         if msg == 'q':

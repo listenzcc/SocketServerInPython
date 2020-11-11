@@ -3,12 +3,14 @@
   <head>
     <title>X11 color set</title>
     <style type="text/css" rel="stylesheet" href="./style.css"></style>
-    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="./d3.v6.min.js"></script>
+    <script src="./showdown.min.js"></script>
   </head>
   <body>
     <h1>X11 color set</h1>
-    <code
-      >alfjowejf;fqwefq ;fqwef;qf;qwe;f;qwef; 'fq'wef'q'wef'q'wf'q'wf'qwe'f
-    </code>
+    <div id="convert_code" class="markdown-body"></div>
+    <script>
+      let div = d3.select('#convert_code')
+    </script>
   </body>
 </html>

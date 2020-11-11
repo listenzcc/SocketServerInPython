@@ -5,7 +5,7 @@ import configparser
 import os
 from ..QuickPythonConfig.Package import Config
 
-dirname = os.path.dirname(__file__)
+dirname = os.path.dirname(__file__)  # .replace('\\', '\\\\')
 
 # Full path of setting file
 setting_path = os.path.join(dirname, 'setting.ini')

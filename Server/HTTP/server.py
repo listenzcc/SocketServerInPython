@@ -11,6 +11,8 @@ from .worker import Worker
 tools = Tools()
 CONFIG.logger.debug('HTTP server imported in HTTP package')
 
+worker = Worker()
+
 
 class HTTPServer(object):
     # HTTPServer object
@@ -115,16 +117,17 @@ class ClientConnection(object):
                 # Received empty income message means closing the client connection
                 self.close()
 
-            # Make response content
+            # Parse request
             parsed_request = tools.parse_request(income)
 
-            if parsed_request['method'] == 'GET' and parsed_request['path'] == '/favicon.ico':
-                self.send(tools.default_icon())
-                return
+            # if parsed_request['method'] == 'GET' and parsed_request['path'] == '/favicon.ico':
+            #     self.send(tools.default_icon())
+            #     return
 
-            res_params = dict(resType='Content-Type: application/json',
-                              resContent=json.dumps(parsed_request))
-            self.send(tools.make_response(**res_params))
+            # res_params = dict(resType='Content-Type: application/json',
+            #                   resContent=json.dumps(parsed_request))
+            # self.send(tools.make_response(**res_params))
+            self.send(worker.response(parsed_request))
 
         except Exception as err:
             # Catch unexpected exception

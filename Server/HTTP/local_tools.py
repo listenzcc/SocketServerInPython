@@ -82,6 +82,7 @@ class Tools(object):
         # Make up regular response
         resLength = 'Content-Length: {} \n'.format(
             len(self.encode(resContent)))
+
         chain = [self.encode(e) for e in [resCode,
                                           resType,
                                           resLength,
