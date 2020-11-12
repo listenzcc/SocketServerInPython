@@ -4,8 +4,22 @@
 import math
 
 
+def hex2rgb(string):
+    # Convert hex [string] to rgb (R, G, B) tuple
+    # string: Str like "#FFFFFF"
+    string = string[-6:]
+    r = int('0x{}'.format(string[0:2]), base=16)
+    g = int('0x{}'.format(string[2:4]), base=16)
+    b = int('0x{}'.format(string[4:6]), base=16)
+    return (r, g, b)
+
+
 def hsv2rgb(h, s, v):
     # Convert color from hsv to rgb
+    # h: Hue value between 0 and 360 degrees
+    # s: Saturation value between 0 and 1.0
+    # v: Vaturation value between 0 and 1.0
+
     # Compute potential variables
     h = float(h)
     s = float(s)
@@ -43,8 +57,16 @@ def hsv2rgb(h, s, v):
     return r, g, b
 
 
+def _rgb2hsv(rgb):
+    # An alias of rgb2hsv function
+    r, g, b = rgb
+    return rgb2hsv(r, g, b)
+
+
 def rgb2hsv(r, g, b):
     # Convert color from rgb to hsv
+    # r, g, b: Int value between 0 and 255
+
     r, g, b = r/255.0, g/255.0, b/255.0
     mx = max(r, g, b)
     mn = min(r, g, b)
@@ -79,4 +101,8 @@ def rgb2hsv(r, g, b):
     # Compute h, s, v values
     h, s, v = _convert()
 
-    return h, s, v
+    def cut(e):
+        # Cut the float into 4 bits length
+        return float(f'{e:.4f}')
+
+    return cut(h), cut(s), cut(v)

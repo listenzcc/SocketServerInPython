@@ -116,6 +116,8 @@ class ClientConnection(object):
             if income == b'':
                 # Received empty income message means closing the client connection
                 self.close()
+                # Return to escape the function
+                return
 
             # Parse request
             parsed_request = tools.parse_request(income)

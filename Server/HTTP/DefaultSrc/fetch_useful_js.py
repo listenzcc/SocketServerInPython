@@ -7,6 +7,7 @@ import os
 import pandas as pd
 import requests
 import time
+import traceback
 
 
 def beside(fname):
@@ -39,10 +40,13 @@ for j in table.index:
     name, url = se.Name, se.URL
     fname = os.path.basename(url)
     print(f'Fetching {name}, {fname}: {url}')
-    got = requests.get(url)
-    text = got.text
-    with open(beside(fname), 'wb') as f:
-        f.write(text.encode('utf-8'))
+    try:
+        got = requests.get(url)
+        text = got.text
+        with open(beside(fname), 'wb') as f:
+            f.write(text.encode('utf-8'))
+    except:
+        print('Fail on fetching: {}'.format(traceback.format_exc()))
 
 
 # %%

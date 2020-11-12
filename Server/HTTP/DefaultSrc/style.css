@@ -1,0 +1,41 @@
+/* Basic CSS settings */
+
+div {
+  border: 1px solid #faaaaa;
+  margin: 5px;
+  padding: 2px;
+}
+
+div:hover {
+  border: 1px solid #ff0000;
+  transition: 500ms linear;
+}
+
+table,
+th,
+td {
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+
+  border: 1px solid #cccccc;
+  font-family: monospace;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th {
+  color: #ffffff;
+  background-color: #3f3f3f;
+  font-size: 16px;
+}
+
+table tr:nth-child(odd) {
+  background-color: #f5f5f5;
+}
+table tr:nth-child(even) {
+  background-color: #ffffff;
+}

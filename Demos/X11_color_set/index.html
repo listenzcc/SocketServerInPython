@@ -1,16 +1,29 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>X11 color set</title>
-    <style type="text/css" rel="stylesheet" href="./style.css"></style>
-    <script src="./d3.v6.min.js"></script>
-    <script src="./showdown.min.js"></script>
-  </head>
-  <body>
+
+<head>
+  <title>X11 color set</title>
+  <link type="text/css" rel="stylesheet" href="./style.css">
+  </link>
+  <link type="text/css" rel="stylesheet" href="./markdown_style.css">
+  </link>
+  <script src="./d3.v6.min.js"></script>
+  <script src="./showdown.min.js"></script>
+</head>
+
+<body>
+  <div>
     <h1>X11 color set</h1>
-    <div id="convert_code" class="markdown-body"></div>
-    <script>
-      let div = d3.select('#convert_code')
-    </script>
-  </body>
+  </div>
+  <div id="color_table_area1">
+    <!-- Table of colors -->
+    <!-- Display the color table here -->
+  </div>
+  <div id="markdown_area1" class="markdown-body">
+    <!-- Markdown body -->
+    <!-- Display the convert code in python -->
+  </div>
+  <script src="./onload.js"></script>
+</body>
+
 </html>
