@@ -2,6 +2,7 @@ from Server.HTTP.server import HTTPServer
 from Server.HTTP import CONFIG
 
 src_dir = './Demos/X11_color_set'
+src_dir = './Demos/Input_method'
 CONFIG.set('Runtime', 'srcDir', src_dir)
 
 server = HTTPServer()
