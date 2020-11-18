@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Input method demo</title>
+    <script src="d3.v6.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+
+<body>
+    <h1>Input method demo</h1>
+    <!-- Input method area -->
+    <div>
+        <!-- Buffered message -->
+        <div>
+            <h2>Buffered message</h2>
+            <textarea id="buffered_message"></textarea>
+        </div>
+
+        <!-- Main input area -->
+        <div>
+            <h2>Input area</h2>
+            <div>
+                <input id="main_input" type="text"></input>
+            </div>
+
+            <!-- Suggestions based on input area -->
+            <h2>Suggestion Area</h2>
+            <div id="suggestion_area">
+            </div>
+        </div>
+    </div>
+
+    <!-- Load onload.js -->
+    <script src="onload.js"></script>
+
+</body>
+
+</html>
