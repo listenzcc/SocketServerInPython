@@ -3,6 +3,7 @@
     "INET",
     "favicon",
     "nums",
-    "onclose"
+    "onclose",
+    "rawdata"
   ]
 }

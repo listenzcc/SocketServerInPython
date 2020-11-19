@@ -10,11 +10,22 @@
         p.suggestOption {
             font-family: monospace;
             padding: 5px;
+            margin: 0px;
         }
 
         p.suggestOption:hover {
             zoom: 1.2;
             font-weight: bold;
+        }
+
+        div#suggestion_area {
+            height: 800px;
+            overflow-y: scroll;
+        }
+
+        textarea#buffered_message {
+            height: 40px;
+            width: 80%;
         }
     </style>
 </head>

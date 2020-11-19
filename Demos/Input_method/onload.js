@@ -58,7 +58,7 @@ function select_option(option) {
   }
 
   var tmp = split(text);
-  document.getElementById("buffered_message").innerHTML += tmp[0];
+  document.getElementById("buffered_message").value += tmp[0];
   document.getElementById("main_input").value = tmp[1];
   update_input();
 }
