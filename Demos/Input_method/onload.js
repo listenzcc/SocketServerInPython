@@ -6,14 +6,9 @@ d3.select("#main_input").attr("oninput", "update_input()");
 
 function split(inp) {
   // Split string of option as [inp]
-  // 1st split, fetch ciZu
-  var ciZu = inp.split(",")[0];
-  // 2nd split, fetch remained pinYin
-  var remain_pinYin = inp.split("'")[1];
-  if (remain_pinYin == undefined) {
-    remain_pinYin = "";
-  }
-  // Return
+  var parts = inp.split(",");
+  var ciZu = parts[1];
+  var remain_pinYin = parts[0].split("'")[1];
   return [ciZu, remain_pinYin];
 }
 
@@ -33,6 +28,8 @@ function update_input() {
     // Show what we got
     // console.log(rawdata);
 
+    value = document.getElementById("main_input").value;
+
     // Makeup data
     var data = [];
     for (var i in rawdata.CiZu) {
@@ -50,6 +47,26 @@ function update_input() {
 
     // Fill suggestion area
     // Fill suggestion option
+    var candidates = rawdata.Candidates;
+    d3.select("#suggestion_option").append("div");
+    for (var group in candidates) {
+      // if (value != group.replace("'", "")) {
+      //   return;
+      // }
+      d3.select("#suggestion_option")
+        .append("div")
+        .selectAll("p")
+        .data(candidates[group].slice(0, 10))
+        .enter()
+        .append("p")
+        .text((d) => {
+          return group + "," + d;
+        })
+        .attr("class", "suggestDom")
+        .attr("onclick", "select_option(this)");
+    }
+    return 0;
+
     d3.select("#suggestion_option")
       .selectAll("p")
       .data(data)
