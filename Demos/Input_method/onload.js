@@ -26,15 +26,15 @@ function update_input() {
   // Check out pinYin input and fill "suggestion area"
   d3.json("pinYinCheckOut?query=" + value).then(function (rawdata) {
     // Show what we got
-    // console.log(rawdata);
+    console.log(rawdata);
 
     value = document.getElementById("main_input").value;
 
     // Makeup data
-    var data = [];
-    for (var i in rawdata.CiZu) {
-      data[i] = [rawdata.CiZu[i], rawdata.PinYin[i]];
-    }
+    // var data = [];
+    // for (var i in rawdata.CiZu) {
+    //   data[i] = [rawdata.CiZu[i], rawdata.PinYin[i]];
+    // }
     // console.log(data);
 
     // Clear suggestion area
@@ -56,7 +56,7 @@ function update_input() {
       d3.select("#suggestion_option")
         .append("div")
         .selectAll("p")
-        .data(candidates[group].slice(0, 10))
+        .data(candidates[group])
         .enter()
         .append("p")
         .text((d) => {
