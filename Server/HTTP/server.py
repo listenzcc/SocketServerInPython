@@ -71,6 +71,7 @@ class HTTPServer(object):
             # connection.send('Hello from server')
             CONFIG.logger.info(f'New connection established at {address}')
             self.connection_pool.append(connection)
+            self.get_connections()
 
 
 class ClientConnection(object):
