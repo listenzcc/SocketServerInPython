@@ -4,244 +4,223 @@ console.log(d3, d3.version);
 // Global variables
 var all_option = [];
 var quick_option = [];
-var quick_idx = 0;
+var quick_page_idx = 0;
+var stack_pinYin = [];
+var stack_ciZu = [];
+var stack_ciZu_length = 0;
 
 // Add change handler to input area
 // d3.select("#main_input").attr("oninput", "update_input()");
-let input = document.getElementById("main_input");
+let input = document.getElementById('main_input');
 input.onkeydown = handle_input;
 function handle_input(e) {
-  // 32: space
-  // 38: up
-  // 40: down
-  var hook_keys = [];
-  hook_keys[32] = "space";
-  hook_keys[38] = "up";
-  hook_keys[40] = "down";
+    console.log(e.keyCode, 'is pressed.');
+    function disable_the_input(e) {
+        // e.keyCode = 0;
+        e.returnValue = false;
+    }
+    // 32: space
+    // 38: up
+    // 40: down
+    // 8: backspace
+    // 13: enter
+    // 48 - 57: 0 - 9
+    var hook_keys = [];
+    hook_keys[13] = 'enter';
+    hook_keys[32] = 'space';
+    hook_keys[38] = 'up';
+    hook_keys[40] = 'down';
 
-  if (e.keyCode in hook_keys) {
-    if (hook_keys[e.keyCode] != undefined) {
-      console.log("Ignoring input of", hook_keys[e.keyCode], e.keyCode);
-      e.keyCode = 0;
-      e.returnValue = false;
+    // Handle number keys
+    if (e.keyCode >= 48 && e.keyCode <= 57) {
+        disable_the_input(e);
+        var idx = e.keyCode - 48;
+        if (idx < quick_option.length) {
+            // Can get option
+            var option = all_option[quick_page_idx * 10 + idx];
+            console.log(option);
+            var full = option['full'].split("'");
+            stack_ciZu[stack_ciZu.length] = option['candidate'][0];
+            stack_ciZu_length += option['candidate'][0].length;
+            stack_pinYin[stack_pinYin.length] = full[0];
+            document.getElementById('main_input').value = stack_ciZu.toString().replaceAll(',', '') + full[1];
+            update_input();
+        }
     }
-    if (e.keyCode == 38) {
-      refresh_suggestion_quick(-1);
-    }
-    if (e.keyCode == 40) {
-      refresh_suggestion_quick(1);
-    }
-    if (e.keyCode == 32) {
-      update_input();
-    }
-  }
-}
 
-function split(inp) {
-  // Split string of option as [inp]
-  var parts = inp.split(",");
-  var ciZu = parts[1];
-  var remain_pinYin = parts[0].split("'")[1];
-  return [ciZu, remain_pinYin];
+    // Handle backspace
+    if (e.keyCode == 8) {
+        if (stack_ciZu.length > 0) {
+            // If stack ciZu has elements,
+            // restore it back to the pinYins in the input area
+            disable_the_input(e);
+            var ciZu = stack_ciZu.pop();
+            stack_ciZu_length -= ciZu.length;
+            var pinYin = stack_pinYin.pop();
+            var value = document.getElementById('main_input').value;
+            document.getElementById('main_input').value =
+                value.slice(0, stack_ciZu_length) + pinYin + value.slice(stack_ciZu_length + ciZu.length);
+            update_input();
+        }
+    }
+
+    // Handle control keys
+    if (e.keyCode in hook_keys) {
+        if (hook_keys[e.keyCode] != undefined) {
+            console.log('Ignoring input of', hook_keys[e.keyCode], e.keyCode);
+            disable_the_input(e);
+        }
+        if (e.keyCode == 13) {
+            let textarea = document.getElementById('buffered_message');
+            textarea.innerHTML += document.getElementById('main_input').value;
+            document.getElementById('main_input').value = '';
+            var pinYin = stack_pinYin.toString().replaceAll(',', '');
+            var ciZu = stack_ciZu.toString().replaceAll(',', '');
+            console.log('Record user dict:', pinYin, '=', ciZu);
+
+            d3.json('pinYinUpdate?pair=' + pinYin + ',' + ciZu).then(function (got) {
+                console.log(got);
+            });
+
+            stack_pinYin = [];
+            stack_ciZu = [];
+            stack_ciZu_length = 0;
+            update_input();
+        }
+        if (e.keyCode == 38) {
+            refresh_suggestion_quick(-1);
+        }
+        if (e.keyCode == 40) {
+            refresh_suggestion_quick(1);
+        }
+        if (e.keyCode == 32) {
+            update_input();
+        }
+    }
 }
 
 function clear(dom) {
-  // Clear all the children of the [dom]
-  while (dom.childElementCount > 0) {
-    dom.firstElementChild.remove();
-  }
+    // Clear all the children of the [dom]
+    while (dom.childElementCount > 0) {
+        dom.firstElementChild.remove();
+    }
 }
 
 function refresh_suggestion_quick(direction) {
-  var num = all_option.length;
-  var max = parseInt(num / 10);
-  if (direction == 1) {
-    // Move forward of suggestions
-    if (quick_idx < max) {
-      quick_idx += 1;
-    }
-  } else {
-    // Move forward of suggestions
-    if (quick_idx > 0) {
-      quick_idx -= 1;
-    }
-  }
-  quick_option = all_option.slice(quick_idx * 10, quick_idx * 10 + 10);
-  for (var i in quick_option) {
-    quick_option[i] = [i, quick_option[i]];
-  }
+    // Refresh the quick suggestions
+    // Settings
+    var num = all_option.length;
+    var max = parseInt(num / 10);
 
-  clear(document.getElementById("suggestion_quick"));
+    // Move quick suggestion page
+    if (direction == 1) {
+        // Move forward of suggestions
+        if (quick_page_idx < max) {
+            quick_page_idx += 1;
+        }
+    } else {
+        // Move forward of suggestions
+        if (quick_page_idx > 0) {
+            quick_page_idx -= 1;
+        }
+    }
 
-  d3.select("#suggestion_quick")
-    .selectAll("p")
-    .data(quick_option)
-    .enter()
-    .append("p")
-    .text((d) => {
-      return d[0] + ":" + d[1]["candidate"][0] + "(" + d[1]["full"] + ")";
-    });
+    // Refresh quick suggestions list
+    quick_option = all_option.slice(quick_page_idx * 10, quick_page_idx * 10 + 10);
+    for (var i in quick_option) {
+        quick_option[i] = [i, quick_option[i]];
+    }
+
+    // Clear quick suggestions area
+    clear(document.getElementById('suggestion_quick'));
+
+    // Add quick suggestions
+    d3.select('#suggestion_quick')
+        .selectAll('p')
+        .data(quick_option)
+        .enter()
+        .append('p')
+        .text((d) => {
+            return d[0] + ':' + d[1]['candidate'][0] + '(' + d[1]['full'] + ')';
+        })
+        .attr('class', 'suggestDom');
 }
 
 function update_input() {
-  var value = document.getElementById("main_input").value;
-  console.log(value);
-
-  // Check out pinYin input and fill "suggestion area"
-  d3.json("pinYinCheckOut?query=" + value).then(function (rawdata) {
-    // Show what we got
-    // console.log(rawdata);
-
-    all_option = [];
-    for (var i in rawdata.Candidates) {
-      for (var j in rawdata.Candidates[i]) {
-        var _option = [];
-        _option["candidate"] = rawdata.Candidates[i][j];
-        _option["prefix"] = rawdata.Prefix[i];
-        _option["remain"] = rawdata.Remain[i];
-        _option["full"] = rawdata.Full[i];
-
-        all_option[all_option.length] = _option;
-      }
-    }
+    var value = document.getElementById('main_input').value;
+    console.log(value);
 
     // Clear suggestion area
-    clear(document.getElementById("suggestion_option"));
-    clear(document.getElementById("suggestion_group"));
+    clear(document.getElementById('suggestion_option'));
+    clear(document.getElementById('suggestion_group'));
+    all_option = [];
 
-    // Init group list
-    var _group = [];
+    value = value.slice(stack_ciZu_length);
+    console.log(value);
+    if (value.length == 0) {
+        quick_page_idx = 0;
+        refresh_suggestion_quick(-1);
+        return;
+    }
 
-    d3.select("#suggestion_option")
-      .selectAll("p")
-      .data(all_option)
-      .enter()
-      .append("p")
-      .text((d) => {
-        name = d["prefix"] + "'" + d["remain"];
-        if (name in _group) {
-          _group[name] += 1;
-        } else {
-          _group[name] = 1;
+    // Check out pinYin input and fill "suggestion area"
+    d3.json('pinYinCheckOut?query=' + value).then(function (rawdata) {
+        // Show what we got
+        // console.log(rawdata);
+
+        // ----------------------------------------------------------
+        // Makeup all_option
+        all_option = [];
+        for (var i in rawdata.Candidates) {
+            for (var j in rawdata.Candidates[i]) {
+                var _option = [];
+                _option['candidate'] = rawdata.Candidates[i][j];
+                _option['prefix'] = rawdata.Prefix[i];
+                _option['remain'] = rawdata.Remain[i];
+                _option['full'] = rawdata.Full[i];
+
+                all_option[all_option.length] = _option;
+            }
         }
-        return name + ", " + d["full"] + ", " + d["candidate"];
-      })
-      .attr("class", "suggestDom");
 
-    var group = [];
-    for (var name in _group) {
-      group[group.length] = [name, _group[name]];
-    }
+        // ----------------------------------------------------------
+        // Add options and makeup groups
+        var _group = [];
 
-    d3.select("#suggestion_group")
-      .selectAll("p")
-      .data(group)
-      .enter()
-      .append("p")
-      .text((d) => {
-        return d;
-      })
-      .attr("class", "suggestDom");
+        d3.select('#suggestion_option')
+            .selectAll('p')
+            .data(all_option)
+            .enter()
+            .append('p')
+            .text((d) => {
+                name = d['prefix'] + "'" + d['remain'];
+                if (name in _group) {
+                    _group[name] += 1;
+                } else {
+                    _group[name] = 1;
+                }
+                return name + ', ' + d['full'] + ', ' + d['candidate'];
+            })
+            .attr('class', 'suggestDom');
 
-    quick_idx = 0;
-    refresh_suggestion_quick(-1);
-    return;
-
-    // Fill suggestion area
-    // Fill suggestion option
-    var candidates = rawdata.Candidates;
-    d3.select("#suggestion_option").append("div");
-    for (var group in candidates) {
-      // if (value != group.replace("'", "")) {
-      //   return;
-      // }
-      d3.select("#suggestion_option")
-        .append("div")
-        .selectAll("p")
-        .data(candidates[group])
-        .enter()
-        .append("p")
-        .text((d) => {
-          return group + "," + d;
-        })
-        .attr("class", "suggestDom")
-        .attr("onclick", "select_option(this)");
-    }
-    return 0;
-
-    d3.select("#suggestion_option")
-      .selectAll("p")
-      .data(data)
-      .enter()
-      .append("p")
-      .text((d) => {
-        return d;
-      })
-      .attr("class", function (d) {
-        if (group_dict[d[1]] == undefined) {
-          group_dict[d[1]] = 0;
-          group[group.length] = d[1];
+        var group = [];
+        for (var name in _group) {
+            group[group.length] = [name, _group[name]];
         }
-        group_dict[d[1]] += 1;
-        return "suggestDom suggestOption suggestOption_" + d[1];
-      })
-      .attr("onclick", "select_option(this)");
 
-    // Fill suggestion group
-    d3.select("#suggestion_group")
-      .selectAll("p")
-      .data(group)
-      .enter()
-      .append("p")
-      .text((d) => {
-        return d + ", " + group_dict[d];
-      })
-      .attr("class", function (d) {
-        return "suggestDom";
-      })
-      .attr("onclick", "select_group(this)");
+        // ----------------------------------------------------------
+        // Add group
+        d3.select('#suggestion_group')
+            .selectAll('p')
+            .data(group)
+            .enter()
+            .append('p')
+            .text((d) => {
+                return d;
+            })
+            .attr('class', 'suggestDom');
 
-    d3.select("#suggestion_group")
-      .append("p")
-      .text("----")
-      .attr("class", function (d) {
-        return "suggestDom";
-      })
-      .attr("onclick", "select_group(this)");
-    console.log(group);
-  });
-}
-
-function select_option(option) {
-  // Handler of clicking an option
-  var text = option.textContent;
-  console.log(text);
-
-  var tmp = split(text);
-  document.getElementById("buffered_message").value += tmp[0];
-  document.getElementById("main_input").value = tmp[1];
-  update_input();
-}
-
-function select_group(group) {
-  // Handler of clicking an group
-  var text = group.textContent;
-  var class_name = "suggestOption_" + text.split(",")[0];
-
-  // Hide all options
-  var doms = document.getElementsByClassName("suggestOption");
-  for (var i = 0; i < doms.length; i++) {
-    doms[i].style.display = "none";
-    if (text == "----") {
-      doms[i].style.display = "";
-    }
-  }
-
-  // Display options of clicked group name
-  if (text != "----") {
-    doms = document.getElementsByClassName(class_name);
-    for (var i = 0; i < doms.length; i++) {
-      doms[i].style.display = "";
-    }
-  }
+        quick_page_idx = 0;
+        refresh_suggestion_quick(-1);
+    });
 }
