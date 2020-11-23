@@ -1,3 +1,4 @@
+import socket
 import webbrowser
 from Server.HTTP.server import HTTPServer
 from Server.HTTP import CONFIG
@@ -5,7 +6,7 @@ from Server.HTTP import CONFIG
 src_dir = './Demos/X11_color_set'
 src_dir = './Demos/Input_method'
 CONFIG.set('Runtime', 'srcDir', src_dir)
-CONFIG.set('Server', 'IP', '10.0.2.44')
+CONFIG.set('Server', 'IP', socket.gethostbyname(socket.gethostname()))
 
 url = 'http://{}:{}/index.html'.format(CONFIG.get('Server', 'IP'),
                                        CONFIG.get('Server', 'port'))
