@@ -36,10 +36,10 @@ function option_getById(id, fmt) {
     switch (fmt) {
         case undefined:
             return opt;
-        case 'quick':
-            return opt['ciZu'][0] + '(' + opt['full'] + ')';
-        case 'normal':
-            return opt['short'] + ', ' + opt['full'] + ', ' + opt['ciZu'];
+        case "quick":
+            return opt["ciZu"][0] + "(" + opt["full"] + ")";
+        case "normal":
+            return opt["short"] + ", " + opt["full"] + ", " + opt["ciZu"];
     }
     return undefined;
 }
@@ -47,6 +47,8 @@ function option_getById(id, fmt) {
 function option_clear() {
     // Clear the all_option
     all_option = [];
+    // Clear the quick_option, either
+    quickOption_move(-1);
     return option_count();
 }
 
@@ -84,6 +86,9 @@ function quickOption_move(direction) {
     }
 
     // Refresh quick suggestions list
-    quick_option = all_option.slice(quick_page_idx * 10, quick_page_idx * 10 + 10);
+    quick_option = all_option.slice(
+        quick_page_idx * 10,
+        quick_page_idx * 10 + 10
+    );
     return quickOption_count();
 }

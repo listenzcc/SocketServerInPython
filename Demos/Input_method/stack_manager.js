@@ -24,8 +24,8 @@ function stack_push(pinYin, ciZu) {
 
 function stack_popAll() {
     // Pop all stacked pinYin and ciZu
-    var pinYin = stack_pinYin.toString().replaceAll(',', '');
-    var ciZu = stack_ciZu.toString().replaceAll(',', '');
+    var pinYin = stack_pinYin.toString().replaceAll(",", "");
+    var ciZu = stack_ciZu.toString().replaceAll(",", "");
     stack_pinYin = [];
     stack_ciZu = [];
     stack_ciZu_length = 0;
@@ -38,4 +38,10 @@ function stack_pop() {
     var ciZu = stack_ciZu.pop();
     stack_ciZu_length -= ciZu.length;
     return [pinYin, ciZu];
+}
+
+function stack_getAllCiZu() {
+    // Get all stacked ciZu,
+    // in joint string
+    return stack_ciZu.toString().replaceAll(",", "");
 }
