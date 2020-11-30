@@ -5,6 +5,7 @@ from Server.HTTP import CONFIG
 
 src_dir = './Demos/X11_color_set'
 src_dir = './Demos/Input_method'
+src_dir = './Demos/DataFrame_visualize'
 CONFIG.set('Runtime', 'srcDir', src_dir)
 CONFIG.set('Server', 'IP', socket.gethostbyname(socket.gethostname()))
 
